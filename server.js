@@ -12,17 +12,17 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const { SHOPIFT_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
+const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
 
 app.prepare().then(() => {
     const server = new Koa();
     server.use(session({ secure: true, sameSite: 'none' }, server));
-    server.keys = [SHOPIFT_API_SECRET_KEY];
+    server.keys = [SHOPIFY_API_SECRET_KEY];
 
     server.use(
         createShopifyAuth({
             apiKey: SHOPIFY_API_KEY,
-            secret: SHOPIFT_API_SECRET_KEY,
+            secret: SHOPIFY_API_SECRET_KEY,
             scopes: [
                 'read_products',
                 'write_products',
