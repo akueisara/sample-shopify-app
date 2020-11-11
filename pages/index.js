@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EmptyState, Layout, Page } from "@shopify/polaris";
 import { ResourcePicker } from '@shopify/app-bridge-react';
 import store from 'store-js';
+import ProductList from '../components/ProductList';
 
 function Index() {
 
@@ -15,29 +16,31 @@ function Index() {
         console.log('this is product ids', store.get('ids'))
     }
 
-    return(
+    return (
         <Page>
             <ResourcePicker
-            resourceType="Product"
-            showVariants={false}
-            open={model.open}
-            onCancel={() => setModel({ open: false })}
-            onSelection={(resources) => handleSelection(resources)} 
-            />
-            <Layout>
-                <EmptyState
-                heading="Manage your inventory transfers"
-                action={{ 
-                    content: 'Select Products',
-                    onAction: () => setModel({ open: true })
-                }}
-                secondaryAction={{ content: 'Learn more', url: 'https://help.shopify.com'}}
-                image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg">
-                    <p>Select Products</p>
-                </EmptyState>
-            </Layout>
+                resourceType="Product"
+                showVariants={false}
+                open={model.open}
+                onCancel={() => setModel({ open: false })}
+                onSelection={(resources) => handleSelection(resources)}/>
+            {emptyState ?
+                <Layout>
+                    <EmptyState
+                        heading="Manage your inventory transfers"
+                        action={{
+                            content: 'Select Products',
+                            onAction: () => setModel({open: true})
+                        }}
+                        secondaryAction={{content: 'Learn more', url: 'https://help.shopify.com'}}
+                        image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg">
+                        <p>Select Products</p>
+                    </EmptyState>
+                </Layout>
+                : <ProductList/>
+            }
         </Page>
-    )
+    );
 }
 
 export default Index;

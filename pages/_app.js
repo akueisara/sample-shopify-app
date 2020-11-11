@@ -6,6 +6,14 @@ import { Provider } from '@shopify/app-bridge-react';
 import Cookies from "js-cookie";
 import '@shopify/polaris/dist/styles.css';
 import translations from '@shopify/polaris/locales/en.json';
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from 'react-apollo';
+
+const client = new ApolloClient({
+  fetchOptions: {
+    credentials: 'include',
+  },
+});
 
 class MyApp extends App {
   render() {
@@ -19,9 +27,11 @@ class MyApp extends App {
           <meta charSet="utf-8" />
         </Head>
         <Provider config={config}>
-            <AppProvider i18n={translations}>
-                <Component {...pageProps} />
-            </AppProvider>
+          <AppProvider i18n={translations}>
+            <ApolloProvider client={client}>
+              <Component {...pageProps} />
+            </ApolloProvider>
+          </AppProvider>
         </Provider>
       </React.Fragment>
     );
