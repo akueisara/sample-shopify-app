@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
-import { Card, Button, ResourceList, Stack, TextStyle, Thumbnail } from '@shopify/polaris';
+import { Query } from 'react-apollo';
+import {Card, Button, ResourceList, Stack, TextStyle, Thumbnail} from '@shopify/polaris';
 import store from 'store-js';
 import React from "react";
 
@@ -33,27 +33,65 @@ const GET_PRODUCTS_BY_ID = gql`
   }
 `;
 
-function ProductList() {
+class ProductList extends React.Component {
+    render() {
 
-  const { loading, error, data } = useQuery(GET_PRODUCTS_BY_ID, { variables: { ids: store.get('ids') } })
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error.message}</div>
-
-  console.log('this is data ', data)
-
-  return (
-    <div>
-      <h1>These are the products selected:</h1>
-      {
-        data.nodes.map(item => {
-          return (
-            <p key={item.id}>{item.title}</p>
-          )
-        })
-      }
-    </div>
-  )
+        return (
+            <Query query={GET_PRODUCTS_BY_ID} variables={{ids: store.get('ids')}}>
+                {({data, loading, error}) => {
+                    if (loading) {
+                        return <div>Loading…</div>;
+                    }
+                    if (error) {
+                        return <div>{error.message}</div>;
+                    }
+                    console.log(data);
+                    return (
+                        <Card>
+                            <ResourceList
+                                showHeader
+                                resourceName={{singular: 'Product', plural: 'Products'}}
+                                items={data.nodes}
+                                renderItem={item => {
+                                    const media = (
+                                        <Thumbnail
+                                            source={
+                                                item.images.edges[0] ? item.images.edges[0].node.originalSrc : ''
+                                            }
+                                            alt={
+                                                item.images.edges[0] ? item.images.edges[0].altText : ''
+                                            }
+                                        />
+                                    );
+                                    const price = item.variants.edges[0].node.price;
+                                    return (
+                                        <ResourceList.Item
+                                            id={item.id}
+                                            media={media}
+                                            accessibilityLabel={'View details for ${item.title}'}
+                                        >
+                                            <Stack>
+                                                <Stack.Item fill>
+                                                    <h3>
+                                                        <TextStyle variation='strong'>
+                                                            {item.title}
+                                                        </TextStyle>
+                                                    </h3>
+                                                </Stack.Item>
+                                                <Stack.Item>
+                                                    <p>${price}</p>
+                                                </Stack.Item>
+                                            </Stack>
+                                        </ResourceList.Item>
+                                    )
+                                }}
+                            />
+                        </Card>
+                    );
+                }}
+            </Query>
+        );
+    }
 }
 
 export default ProductList;
